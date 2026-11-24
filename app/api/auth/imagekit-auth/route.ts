@@ -1,0 +1,22 @@
+import { getUploadAuthParams } from "@imagekit/next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+
+export async function GET() {
+    const session = await getServerSession(authOptions);
+    if (!session) {
+        return Response.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const { token, expire, signature } = getUploadAuthParams({
+        privateKey: process.env.IMAGEKIT_PRIVATE_KEY as string, // never expose to the client
+        publicKey: process.env.NEXT_PUBLIC_PUBLIC_KEY as string,
+    });
+
+    return Response.json({
+        token,
+        expire,
+        signature,
+        publicKey: process.env.NEXT_PUBLIC_PUBLIC_KEY,
+    });
+}
