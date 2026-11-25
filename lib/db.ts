@@ -1,45 +1,45 @@
-import mongoose from "mongoose"
+import mongoose from "mongoose";
 
-// get mongodb/db url
-const MONGODB_URI = process.env.MONGODB_URI!;
+const MONGODB_URI = process.env.MONGODB_URI;
 
-// if db url not present, throw error
 if (!MONGODB_URI) {
-    throw new Error("Check you mongo db url");
+    throw new Error("Please define MONGODB_URI in .env");
 }
 
 let cached = global.mongoose;
 
 if (!cached) {
-    cached = global.mongoose = {
-        conn: null,
-        promise: null
-    }
+    cached = global.mongoose = { conn: null, promise: null };
 }
 
-// function we use to connect to database
 export async function connectDb() {
-    // connection akready present, send cached connection
+    // reuse existing connection
     if (cached.conn) {
         return cached.conn;
     }
 
-    // connection not present
-    // promise not present create a promise
-    if(!cached.promise) {
+    // create the connection promise once
+    if (!cached.promise) {
         const opts = {
-            bufferCommand: true,
-            maxPoolSize: 10
+            bufferCommands: false,          // correct spelling, fail fast
+            maxPoolSize: 10,
+            serverSelectionTimeoutMS: 5000, // give up after 5s with a real error
         };
 
-        cached.promise = mongoose.connect(MONGODB_URI, opts).then(() => mongoose.connection);
+        cached.promise = mongoose
+            .connect(MONGODB_URI, opts)
+            .then(() => {
+                console.log("connected to db");   // only logs on real success
+                return mongoose.connection;
+            });
     }
 
     try {
         cached.conn = await cached.promise;
     } catch (error) {
-        cached.promise = null;
+        cached.promise = null;   // allow retry on next request
+        throw error;             // surface the real error
     }
-    console.log("connected to db")
+
     return cached.conn;
 }

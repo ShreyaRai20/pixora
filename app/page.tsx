@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { apiClient } from "@/lib/api-client";
-import { IProduct } from "@/models/product.model";
+import { IProduct } from "@/lib/product-types";
 import ImageGallery from "@/components/ImageGallery";
 
 export default function Home() {
@@ -12,7 +12,7 @@ export default function Home() {
     const fetchProducts = async () => {
       try {
         const data = await apiClient.getProducts();
-        setProducts(data);
+        setProducts(data.products);
       } catch (error) {
         console.error("Error fetching products:", error);
       }
