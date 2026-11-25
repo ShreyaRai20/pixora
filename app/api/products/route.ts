@@ -24,7 +24,7 @@ export async function GET() {
         console.log(error)
         return NextResponse.json(
                 {error: "Something went wrong"},
-                {status: 200}
+                {status: 400}
             )
     }
 }
