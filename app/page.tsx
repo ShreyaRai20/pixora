@@ -1,4 +1,5 @@
 "use client"
+import { apiClient } from "@/lib/api-client";
 import { IProduct } from "@/models/product.model";
 import { useEffect, useState } from "react";
 
@@ -8,9 +9,8 @@ export default function Home() {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const data = await fetch("api/products")
-        const result = await data.json()
-        console.log(result)
+        const data = await apiClient.getProducts()
+        console.log(data)
       } catch (error) {
 
       }
