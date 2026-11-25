@@ -1,6 +1,6 @@
 
 import { IOrder } from "@/models/order.model";
-import { IImageVariant, IProduct } from "@/models/product.model";
+import { IImageVariant, IProduct } from "@/lib/product-types";
 import { Types } from "mongoose";
 
 export type ProductFormData = Omit<IProduct, "_id">;
